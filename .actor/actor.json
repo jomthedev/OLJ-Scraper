@@ -1,0 +1,10 @@
+{
+    "actorSpecification": 1,
+    "name": "onlinejobs-ph-scraper",
+    "title": "OnlineJobs.ph Job Scraper",
+    "description": "Scrapes public job listings from OnlineJobs.ph.",
+    "version": "0.1",
+    "buildTag": "latest",
+    "input": "./input_schema.json",
+    "dockerfile": "./Dockerfile"
+}

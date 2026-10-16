@@ -1,0 +1,75 @@
+{
+    "title": "OnlineJobs.ph Job Scraper",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "keyword": {
+            "title": "Keyword",
+            "type": "string",
+            "description": "Search keyword, e.g. Dynamics 365. Ignored if Start URLs is set.",
+            "editor": "textfield"
+        },
+        "employmentType": {
+            "title": "Employment type",
+            "type": "string",
+            "description": "Jobs marked \"Any\" are always kept.",
+            "enum": ["any", "Full Time", "Part Time", "Gig"],
+            "default": "any"
+        },
+        "startUrls": {
+            "title": "Start URLs",
+            "type": "array",
+            "description": "Search result URLs pasted from your browser (with your filters applied).",
+            "editor": "requestListSources"
+        },
+        "maxJobs": {
+            "title": "Max jobs",
+            "type": "integer",
+            "description": "Maximum jobs to return (30 jobs per search page).",
+            "default": 100,
+            "minimum": 1
+        },
+        "includeDetails": {
+            "title": "Include job details",
+            "type": "boolean",
+            "description": "Open each job page for the full description, hours per week and date updated.",
+            "default": true
+        },
+        "postedWithinDays": {
+            "title": "Posted within days",
+            "type": "integer",
+            "description": "Only keep jobs posted in the last N days. 0 = off.",
+            "default": 0,
+            "minimum": 0
+        },
+        "startDate": {
+            "title": "Posted from (start date)",
+            "type": "string",
+            "description": "Only keep jobs posted on or after this date (YYYY-MM-DD). Overrides \"Posted within days\".",
+            "editor": "datepicker",
+            "dateType": "absolute"
+        },
+        "endDate": {
+            "title": "Posted until (end date)",
+            "type": "string",
+            "description": "Only keep jobs posted on or before this date (YYYY-MM-DD).",
+            "editor": "datepicker",
+            "dateType": "absolute"
+        },
+        "requestDelaySecs": {
+            "title": "Delay between requests (seconds)",
+            "type": "integer",
+            "description": "OnlineJobs.ph's robots.txt asks for 5 seconds. Lowering this is faster but less polite and may get you blocked.",
+            "default": 5,
+            "minimum": 1,
+            "maximum": 60
+        },
+        "proxyConfiguration": {
+            "title": "Proxy configuration",
+            "type": "object",
+            "description": "Apify Proxy settings.",
+            "editor": "proxy",
+            "prefill": { "useApifyProxy": true }
+        }
+    }
+}
