@@ -64,6 +64,12 @@
             "minimum": 1,
             "maximum": 60
         },
+        "redactContactInfo": {
+            "title": "Redact contact info",
+            "type": "boolean",
+            "description": "Replace emails, phone numbers, messenger IDs, @handles and personal profile links in job descriptions with [redacted].",
+            "default": true
+        },
         "proxyConfiguration": {
             "title": "Proxy configuration",
             "type": "object",

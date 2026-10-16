@@ -1,6 +1,6 @@
 import { Actor, log } from 'apify';
 import { CheerioCrawler } from 'crawlee';
-import { parseSearchPage, parseJobPage } from './parsers.js';
+import { parseSearchPage, parseJobPage, redactContactInfo } from './parsers.js';
 
 const SEARCH_BASE = 'https://www.onlinejobs.ph/jobseekers/jobsearch';
 const PAGE_SIZE = 30;
@@ -17,6 +17,7 @@ const {
     startDate = '',
     endDate = '',
     requestDelaySecs = 5,
+    redactContactInfo: redact = true,
     proxyConfiguration,
 } = (await Actor.getInput()) ?? {};
 
@@ -67,6 +68,8 @@ const isTooNew = (job) => !!toDay && !!dayOf(job) && dayOf(job) > toDay;
 const seen = new Set();
 let accepted = 0;
 
+const clean = (text) => (redact ? redactContactInfo(text) : text);
+
 const toRecord = (listing, detail = {}) => {
     const pick = (key) => detail[key] ?? listing[key] ?? null;
     return {
@@ -79,8 +82,8 @@ const toRecord = (listing, detail = {}) => {
         hoursPerWeek: detail.hoursPerWeek ?? null,
         datePosted: listing.datePosted ?? null,
         dateUpdated: detail.dateUpdated ?? null,
-        descriptionSnippet: listing.descriptionSnippet ?? null,
-        fullDescription: detail.fullDescription ?? null,
+        descriptionSnippet: clean(listing.descriptionSnippet ?? null),
+        fullDescription: clean(detail.fullDescription ?? null),
         skills: detail.skills?.length ? detail.skills : listing.skills ?? [],
         scrapedAt: new Date().toISOString(),
     };

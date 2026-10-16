@@ -15,6 +15,7 @@ Scrapes public job listings from [OnlineJobs.ph](https://www.onlinejobs.ph) and 
 | `startDate` | Only keep jobs posted on or after this date (`YYYY-MM-DD`, inclusive). Overrides `postedWithinDays`. | |
 | `endDate` | Only keep jobs posted on or before this date (`YYYY-MM-DD`, inclusive). | |
 | `requestDelaySecs` | Seconds between requests. The site's robots.txt asks for 5. | `5` |
+| `redactContactInfo` | Replace emails, phone numbers, messenger IDs, @handles and personal profile links in descriptions with `[redacted]`. | `true` |
 | `proxyConfiguration` | Apify Proxy settings. | Apify Proxy on |
 
 ## Output
@@ -42,6 +43,7 @@ One record per job:
 Notes:
 - `employerName` is only filled when the search page shows an employer label (some cards do). Otherwise it is `null`; the site hides employer details from logged-out visitors.
 - `salary` is the free text the employer typed (`5`, `$5/hour`, `TBD`, `PHP 80,000 – 130,000 / month`), so it is not normalised.
+- With `redactContactInfo` on, contact details employers type into descriptions become `[redacted]`. Salaries, dates and company websites are kept.
 - `datePosted` is the timestamp shown on the site, in the site's own time zone.
 - Fields such as `isRemote` and `benefits` do not exist on this site. Every job is remote, and benefits are part of the free-text description.
 

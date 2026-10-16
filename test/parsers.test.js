@@ -3,7 +3,7 @@
 // It checks the parsing logic, not the live site markup.
 import assert from 'node:assert/strict';
 import { load } from 'cheerio';
-import { parseSearchPage, parseJobPage, parseJobHref } from '../src/parsers.js';
+import { parseSearchPage, parseJobPage, parseJobHref, redactContactInfo } from '../src/parsers.js';
 
 const searchHtml = `
 <html><body>
@@ -103,5 +103,28 @@ assert.match(d.fullDescription, /^Microsoft Dynamics 365 & Power Platform Develo
 assert.match(d.fullDescription, /• Build Power Apps/);
 assert.match(d.fullDescription, /OHmazing Tech/);
 assert.doesNotMatch(d.fullDescription, /SKILL REQUIREMENT|VIEW OTHER JOB POSTS|Copyright/);
+
+// --- Contact info redaction ---
+const r = redactContactInfo;
+assert.equal(r('Send your CV to maria.santos@gmail.com today'), 'Send your CV to [redacted] today');
+assert.equal(r('Email: jane [at] yahoo [dot] com'), 'Email: [redacted]');
+assert.equal(r('Call +63 917 123 4567'), 'Call [redacted]');
+assert.equal(r('Text 09171234567 or 0917-123-4567'), 'Text [redacted] or [redacted]');
+assert.equal(r('US line (555) 123-4567'), 'US line [redacted]');
+assert.equal(r('Skype: live:john.doe_12, Telegram ID: jdoe'), 'Skype: [redacted], Telegram ID: [redacted]');
+assert.equal(r('DM me @hiring_mgr on X'), 'DM me [redacted] on X');
+assert.equal(r('Apply via https://www.linkedin.com/in/jane-doe-123 or wa.me/639171234567'), 'Apply via [redacted] or [redacted]');
+// Things that must survive
+for (const keep of [
+    'Salary 55000-60000 per month',
+    'PHP 80,000 – 130,000 / month',
+    '$5/hour, 40 hours per week',
+    'Posted on 2026-10-15 13:52:21',
+    'We work at home. Visit https://acme.com/careers',
+    'Job ID 1750230',
+]) {
+    assert.equal(r(keep), keep, `should not redact: ${keep}`);
+}
+assert.equal(r(null), null);
 
 console.log('All parser tests passed.');

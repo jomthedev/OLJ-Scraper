@@ -237,3 +237,43 @@ export function parseJobPage($, pageUrl) {
         skills,
     };
 }
+
+const REDACTED = '[redacted]';
+const EMAIL_RE = /[\w.%+-]+@[\w-]+(?:\.[\w-]+)*\.[a-z]{2,}/gi;
+// Obfuscated emails such as "jane [at] gmail [dot] com". Only bracketed forms, so prose like "work at home" is left alone.
+const OBFUSCATED_EMAIL_RE = /[\w.+-]+\s*[[({]\s*at\s*[\])}]\s*[\w-]+(?:\s*(?:[[({]\s*dot\s*[\])}]|\.)\s*[\w-]+)+/gi;
+const PROFILE_URL_RE =
+    /\b(?:https?:\/\/)?(?:www\.|m\.)?(?:facebook\.com|fb\.com|m\.me|linkedin\.com\/in|wa\.me|t\.me|telegram\.me|instagram\.com|twitter\.com|x\.com|calendly\.com)\/[^\s<>()]+/gi;
+const MESSENGER_ID_RE =
+    /\b(skype|telegram|discord|viber|wechat|whatsapp|signal|kik)(\s*(?:id|name|handle|username|number|no\.?|#)?\s*[:=-]\s*)(?:live:)?[^\s,;]+/gi;
+const HANDLE_RE = /(^|[\s(])@[A-Za-z0-9_][A-Za-z0-9_.]{2,}/g;
+// Candidate phone numbers: an optional "+", then digits with spaces, dots, dashes or parentheses between them.
+const PHONE_CANDIDATE_RE = /\+?\(?\d[\d\s().-]{5,}\d/g;
+
+/** True when a digit run looks like a phone number rather than a salary, range or date. */
+function looksLikePhone(s) {
+    const digits = s.replace(/\D/g, '');
+    if (digits.length < 7 || digits.length > 15) return false;
+    if (/^\d{4}-\d{2}-\d{2}/.test(s.trim())) return false; // date
+    if (s.trim().startsWith('+')) return true;
+    if (/^(?:0|63)?9\d{9}$/.test(digits)) return true; // PH mobile: 09xx / 639xx
+    if (/\(\d{2,4}\)/.test(s)) return true; // area code in parentheses
+    if (/^\s*\d{3,4}[\s.-]\d{3,4}[\s.-]\d{4}\s*$/.test(s)) return true; // 3-3-4 / 4-3-4 groups
+    if (/^\s*\d{3}[\s.-]\d{4}\s*$/.test(s)) return true; // 7-digit local 123-4567
+    return /^\d{10,13}$/.test(s.trim()); // long unformatted number
+}
+
+/**
+ * Replaces emails, phone numbers, messenger IDs, @handles and personal profile links with "[redacted]".
+ * Company websites and ordinary numbers (salaries, ranges, dates) are kept.
+ */
+export function redactContactInfo(text) {
+    if (!text) return text;
+    return text
+        .replace(EMAIL_RE, REDACTED)
+        .replace(OBFUSCATED_EMAIL_RE, REDACTED)
+        .replace(PROFILE_URL_RE, REDACTED)
+        .replace(MESSENGER_ID_RE, (_m, app, sep) => `${app}${sep}${REDACTED}`)
+        .replace(HANDLE_RE, (_m, pre) => `${pre}${REDACTED}`)
+        .replace(PHONE_CANDIDATE_RE, (m) => (looksLikePhone(m) ? REDACTED : m));
+}
