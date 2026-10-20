@@ -1,0 +1,43 @@
+{
+    "actorSpecification": 1,
+    "fields": {
+        "type": "object",
+        "properties": {
+            "jobUrl": { "type": "string" },
+            "jobId": { "type": "string" },
+            "jobTitle": { "type": ["string", "null"] },
+            "employerName": { "type": ["string", "null"] },
+            "employmentType": { "type": ["string", "null"] },
+            "salary": { "type": ["string", "null"] },
+            "hoursPerWeek": { "type": ["integer", "string", "null"] },
+            "datePosted": { "type": ["string", "null"] },
+            "dateUpdated": { "type": ["string", "null"] },
+            "descriptionSnippet": { "type": ["string", "null"] },
+            "fullDescription": { "type": ["string", "null"] },
+            "skills": { "type": "array", "items": { "type": "string" } },
+            "scrapedAt": { "type": "string" }
+        },
+        "required": ["jobUrl", "jobId"]
+    },
+    "views": {
+        "overview": {
+            "title": "Jobs",
+            "transformation": {
+                "fields": ["jobTitle", "employerName", "employmentType", "salary", "hoursPerWeek", "datePosted", "skills", "jobUrl"]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "jobTitle": { "label": "Title" },
+                    "employerName": { "label": "Employer" },
+                    "employmentType": { "label": "Type" },
+                    "salary": { "label": "Salary" },
+                    "hoursPerWeek": { "label": "Hours/week" },
+                    "datePosted": { "label": "Posted", "format": "date" },
+                    "skills": { "label": "Skills", "format": "array" },
+                    "jobUrl": { "label": "URL", "format": "link" }
+                }
+            }
+        }
+    }
+}
